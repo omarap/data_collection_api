@@ -37,10 +37,74 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+    'allauth', # new
+    'allauth.account', # new
+    'allauth.socialaccount', # new
+    'dj_rest_auth', 
+    'dj_rest_auth.registration', # new
+    'django_filters',
+    'rest_pandas',
+    'matplotlib',
+    'django_pandas',
+    'pandas',
+    'rest_framework_latex',
+
     'api',
     'analysis',
     'pandas_analysis'
 ]
+
+REST_FRAMEWORK = {
+'DEFAULT_PERMISSION_CLASSES': [
+'rest_framework.permissions.IsAuthenticated',
+],
+
+'DEFAULT_AUTHENTICATION_CLASSES': [
+'rest_framework.authentication.SessionAuthentication',
+'rest_framework.authentication.TokenAuthentication', # new
+],
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework_latex.renderers.LatexRenderer'
+    ]
+}
+
+LATEX_RESOURCES = [
+    BASE_DIR / "templates/directory"
+]
+
+
+REST_PANDAS = {
+    "RENDERERS": (
+        "rest_pandas.renderers.PandasHTMLRenderer",
+        "rest_pandas.renderers.PandasCSVRenderer",
+        "rest_pandas.renderers.PandasTextRenderer",
+        "rest_pandas.renderers.PandasJSONRenderer",
+        "rest_pandas.renderers.PandasExcelRenderer",
+        "rest_pandas.renderers.PandasOldExcelRenderer",
+        "rest_pandas.renderers.PandasPNGRenderer",
+        "rest_pandas.renderers.PandasSVGRenderer",
+    ),
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # new
+SITE_ID = 1 # new
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +121,7 @@ ROOT_URLCONF = 'data_collection_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [ BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,6 +183,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR /'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
+
+LOGIN_REDIRECT_URL = 'main'
+LOGIN_REDIRECT_URL = 'main'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
