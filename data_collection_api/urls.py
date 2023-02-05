@@ -28,7 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('api.urls')),
     path('api/analysis/', include('analysis.urls')),
-    path('api/pandas_analysis/', include('pandas_analysis.urls')),
+    path('api/pandas/analysis/', include('pandas_analysis.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('password/reset/confirm/<uidb64>/<token>',PasswordResetConfirmView.as_view(),
         name='password_reset_confirm'),

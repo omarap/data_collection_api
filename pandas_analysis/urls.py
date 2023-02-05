@@ -12,7 +12,9 @@ urlpatterns = (
     path("constructiondata/download/", views.ConstructionPandasView.as_view(), name='construction-data-download'),
     path("treesdata/download/", views.TreePandasView.as_view(), name='trees-data-download'),
     path("cropsdata/download/", views.CropPandasView.as_view(), name='crops-data-download'),
-    path("landdata/download/", views.LandPandasView.as_view(), name='land-data-download')               
+    path("landdata/download/", views.LandPandasView.as_view(), name='land-data-download'),
+    path('upload/landcsv/', views.UploadLandListFileView.as_view(), name='upload-land-file-csv'),
+    path('upload/treecsv/', views.UploadTreeFileView.as_view(), name='upload-trees-file-csv'),              
 )
 
 # The following is required to support extension-style formats (e.g. /data.csv)

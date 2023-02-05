@@ -20,14 +20,14 @@ class ProjectAffectedPerson(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} {self.nin}"
 
-class ConstructionList(models.Model):
+class ConstructionName(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, related_name='construction_list_owners', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return self.name
    
 class ConstructionBuilding(models.Model):
     """
@@ -40,7 +40,7 @@ class ConstructionBuilding(models.Model):
     ]
     """
     pap = models.ForeignKey(ProjectAffectedPerson, related_name='pap_construction',on_delete=models.CASCADE)
-    name = models.ForeignKey(ConstructionList, related_name='list_of_construction', on_delete=models.CASCADE)
+    name = models.ForeignKey(ConstructionName, related_name='list_of_construction', on_delete=models.CASCADE)
     construction_image = models.ImageField(upload_to='construction_uploads', blank=True)
     size = models.FloatField(default=0)
     number_of_construction = models.PositiveSmallIntegerField(default=0)
@@ -56,7 +56,7 @@ class ConstructionBuilding(models.Model):
     def value_of_structures(self):
         return self.size * self.number_of_construction * self.rate
    
-class TreeList(models.Model):
+class TreeName(models.Model):
     name = models.CharField(max_length=100)
     rate = models.PositiveIntegerField(default=0, blank=True)
     district = models.CharField(max_length=100, blank=True)
@@ -65,7 +65,7 @@ class TreeList(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return self.name
    
 
 class Tree(models.Model):
@@ -108,7 +108,7 @@ class Tree(models.Model):
 
     """
     pap = models.ForeignKey(ProjectAffectedPerson, related_name='pap_trees',on_delete=models.CASCADE)
-    name = models.ForeignKey(TreeList, related_name = 'list_of_trees',on_delete=models.CASCADE)
+    name = models.ForeignKey(TreeName, related_name = 'list_of_trees',on_delete=models.CASCADE)
     description = models.CharField(max_length=50, blank=True)
     tree_image = models.ImageField(upload_to='tree_uploads', blank=True)
     quantity = models.PositiveSmallIntegerField(default=0)
@@ -125,7 +125,7 @@ class Tree(models.Model):
     def value_of_trees(self):
         return self.quantity * self.rate
    
-class CropList(models.Model):
+class CropName(models.Model):
     name = models.CharField(max_length=50)
     rate = models.PositiveIntegerField()
     district = models.CharField(max_length=100, blank=True)
@@ -186,7 +186,7 @@ class Crop(models.Model):
     ),
 ]
     '''
-    crop_name = models.ForeignKey(CropList, related_name='crop_list', on_delete=models.CASCADE )
+    crop_name = models.ForeignKey(CropName, related_name='crop_list', on_delete=models.CASCADE )
     crop_image = models.ImageField(upload_to='crop_uploads', blank=True)
     description = models.CharField(max_length=50, blank=True)
     quantity = models.PositiveIntegerField()
@@ -205,7 +205,7 @@ class Crop(models.Model):
         return self.quantity * self.rate
 
    
-class LandList(models.Model):
+class LandName(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, related_name='land_list_owners', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
@@ -248,7 +248,7 @@ class Land(models.Model):
         ('Customary Land', 'Customary Land')
     )
     """
-    land_type = models.ForeignKey(LandList, related_name='list_of_land', on_delete=models.CASCADE)
+    land_type = models.ForeignKey(LandName, related_name='list_of_land', on_delete=models.CASCADE)
     land_image = models.ImageField(upload_to='land_uploads', blank=True)
     survey_no = models.CharField(max_length=200, blank=True, unique=True, null=True)
     pap = models.ForeignKey(ProjectAffectedPerson, related_name='pap_lands', on_delete=models.CASCADE)

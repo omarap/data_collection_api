@@ -19,6 +19,7 @@ from rest_framework import renderers
 import pandas as pd
 import numpy as np
 from django.core import serializers
+from rest_framework import status, generics, renderers, filters
 
 
 # Create your views here.
@@ -33,7 +34,9 @@ def pandas_analysis_root(request, format = None):
       'construction_data_download': reverse('construction-data-download', request = request, format = format),
       'trees_data_download': reverse('trees-data-download', request = request, format = format),
       'crops_data_download': reverse('crops-data-download', request = request, format = format),
-      'land_data_download': reverse('land-data-download', request = request, format = format)
+      'land_data_download': reverse('land-data-download', request = request, format = format),
+      'upload_trees_csv_file': reverse('upload-trees-file-csv', request = request, format = format),
+      'upload_land_csv_file': reverse('upload-land-file-csv', request = request, format = format)
    })
 
 #JSON data for project affected person
@@ -235,3 +238,45 @@ class ListPAPs(viewsets.ViewSet):
         raise Http404
     
 
+#Land CSV FILE UPLOADS
+class UploadLandListFileView(generics.CreateAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = LandListUploadSerializer
+
+    def create(self, request):
+        owner = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid()
+        file = serializer.validated_data['file']
+        reader = pd.read_csv(file)
+        for _, row in reader.iterrows():
+            new_land_file = LandList(
+                owner = owner,
+                name = row['name'])
+            new_land_file.save()
+        return Response({"status": "success"},status.HTTP_201_CREATED)
+
+
+#Tree CSV FILE UPLOADS
+class UploadTreeFileView(generics.CreateAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = TreeUploadSerializer
+    
+    def create(self, request, *args, **kwargs):
+        owner = self.request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        file = serializer.validated_data['file']
+        reader = pd.read_csv(file)
+        for _, row in reader.iterrows():
+            new_trees_file = TreeList(
+                       owner = owner,
+                       name= row["name"],
+                       rate= row["rate"],
+                       district= row["district"]
+                       )
+            new_trees_file.save()
+        return Response({"status": "success"},
+                        status.HTTP_201_CREATED)

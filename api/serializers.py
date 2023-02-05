@@ -1,3 +1,4 @@
+from django.template import Context
 from rest_framework import serializers
 from rest_framework import *
 from .models import *
@@ -9,8 +10,7 @@ class UserPapForeignKey(serializers.SlugRelatedField):
     def get_queryset(self):
         qs = super().get_queryset()
         request = self.context.get('request')
-        owner = request.user
-        qs = ProjectAffectedPerson.objects.filter(owner = self.context.get("request").user).order_by('-created')[:6]
+        qs = ProjectAffectedPerson.objects.filter(owner = self.context["request"].user).order_by('-created')[:6]
         return qs
     
 
@@ -25,20 +25,20 @@ class PaPRelatedField(serializers.PrimaryKeyRelatedField):
 class ConstructionListSerialier(serializers.ModelSerializer):
     
     class Meta:
-        model = ConstructionList
+        model = ConstructionName
         fields =['name', 'created', 'updated']
     
     def create(self, validated_data):
         """
         Create and return a new `ConstructionList` instance, given the validated data.
         """
-        return ConstructionList.objects.create(**validated_data)
+        return ConstructionName.objects.create(**validated_data)
 
 class ConstructionBuildingSerializer(serializers.ModelSerializer):
     pap = PaPRelatedField()
     name = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=ConstructionList.objects.all()
+        queryset=ConstructionName.objects.all()
     )
     
     class Meta:
@@ -55,14 +55,14 @@ class ConstructionBuildingSerializer(serializers.ModelSerializer):
 class CropListSerialier(serializers.ModelSerializer):
     
     class Meta:
-        model = CropList
+        model = CropName
         fields =['name', 'rate', 'district', 'created', 'updated']
-    
+
     def create(self, validated_data):
         """
         Create and return a new `CropList` instance, given the validated data.
         """
-        return CropList.objects.create(**validated_data)
+        return CropName.objects.create(**validated_data)
 
 
 class CropSerializer(serializers.ModelSerializer):
@@ -73,7 +73,7 @@ class CropSerializer(serializers.ModelSerializer):
     )
     crop_name = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=CropList.objects.all()
+        queryset=CropName.objects.all()
 
     )
     class Meta:
@@ -90,14 +90,14 @@ class CropSerializer(serializers.ModelSerializer):
 class LandListSerialier(serializers.ModelSerializer):
     
     class Meta:
-        model = LandList
+        model = LandName
         fields =['name', 'created', 'updated']
     
     def create(self, validated_data):
         """
         Create and return a new `LandList` instance, given the validated data.
         """
-        return LandList.objects.create(**validated_data)
+        return LandName.objects.create(**validated_data)
 
 class TenureTypeSerialier(serializers.ModelSerializer):
     
@@ -118,7 +118,7 @@ class LandSerializer(serializers.ModelSerializer):
     )
     land_type = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=LandList.objects.all()
+        queryset=LandName.objects.all()
     )
     tenure = serializers.SlugRelatedField(
         slug_field='name',
@@ -133,23 +133,24 @@ class LandSerializer(serializers.ModelSerializer):
 class TreeListSerialier(serializers.ModelSerializer):
     
     class Meta:
-        model = TreeList
+        model = TreeName
         fields =['name', 'rate', 'district', 'created', 'updated']
     
     def create(self, validated_data):
         """
         Create and return a new `TreeList` instance, given the validated data.
         """
-        return TreeList.objects.create(**validated_data)
+        return TreeName.objects.create(**validated_data)
 
 class TreeSerializer(serializers.ModelSerializer):
-    pap = UserPapForeignKey(
+    pap = serializers.SlugRelatedField(
         slug_field='first_name',
-        queryset=TreeList.objects.all()
+        queryset=ProjectAffectedPerson.objects.all()
+
     )
     name = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=TreeList.objects.all()
+        queryset=TreeName.objects.all()
     )
     
     class Meta:
@@ -201,7 +202,7 @@ class CropUploadSerializer(serializers.Serializer):
 class SaveCropFileSerializer(serializers.Serializer):
     
     class Meta:
-        model = CropList
+        model = CropName
         fields =  fields =['name', 'rate', 'district']
 
 #LAND LIST NAMES CSV Uploads
@@ -211,14 +212,14 @@ class LandListUploadSerializer(serializers.Serializer):
 class SaveLandListFileSerializer(serializers.Serializer):
     
     class Meta:
-        model = LandList
+        model = LandName
         fields =  fields =['name']
 
     def create(self, validated_data):
         """
         Create and return a new `LandList` instance, given the validated data.
         """
-        return LandList.objects.create(**validated_data)
+        return LandName.objects.create(**validated_data)
 
 
 #LAND TUNURE NAMES CSV Uploads
@@ -244,7 +245,7 @@ class ConstructionNameListUploadSerializer(serializers.Serializer):
 class SaveConstructionNameListFileSerializer(serializers.Serializer):
     
     class Meta:
-        model = ConstructionList
+        model = ConstructionName
         fields =  fields =['name']
 
 #TREES CSV Uploads
@@ -254,7 +255,7 @@ class TreeUploadSerializer(serializers.Serializer):
 class SaveTreeFileSerializer(serializers.Serializer):
     
     class Meta:
-        model = TreeList
+        model = TreeName
         fields =  fields =['name', 'rate', 'district']
 
     

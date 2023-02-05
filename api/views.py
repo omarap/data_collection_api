@@ -33,9 +33,7 @@ def api_root(request, format = None):
       'upload_pap_csv_file': reverse('upload-pap-file-csv', request = request, format = format),
       'upload_crops_csv_file': reverse('upload-crop-file-csv', request = request, format = format),
       'upload_construction_csv_file': reverse('upload-construction-file-csv', request = request, format = format),
-      'upload_trees_csv_file': reverse('upload-trees-file-csv', request = request, format = format),
-      'upload_tenure_csv_file': reverse('upload-tenure-file-csv', request = request, format = format),
-      'upload_land_csv_file': reverse('upload-land-file-csv', request = request, format = format)
+      'upload_tenure_csv_file': reverse('upload-tenure-file-csv', request = request, format = format)
    })
 
 #projected affected person
@@ -104,7 +102,7 @@ class ProjectAffectedPersonNameView(viewsets.ViewSet):
 class ConstructionListName(generics.ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ConstructionList.objects.all().order_by('-created')
+    queryset = ConstructionName.objects.all().order_by('-created')
     serializer_class = ConstructionListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -119,7 +117,7 @@ class ConstructionListName(generics.ListCreateAPIView):
 class ConstructionListDetailName(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ConstructionList.objects.all().order_by('-created')
+    queryset = ConstructionName.objects.all().order_by('-created')
     serializer_class = ConstructionListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -203,7 +201,7 @@ class ConstructionDetailNameView(viewsets.ViewSet):
 class TreeListName(generics.ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = TreeList.objects.all().order_by('-created')
+    queryset = TreeName.objects.all().order_by('-created')
     serializer_class = TreeListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -218,7 +216,7 @@ class TreeListName(generics.ListCreateAPIView):
 class TreeListDetailName(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = TreeList.objects.all().order_by('-created')
+    queryset = TreeName.objects.all().order_by('-created')
     serializer_class = TreeListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -233,13 +231,6 @@ class TreeList(generics.ListCreateAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
-    def perform_create(self, request, serializer):
-        owner = self.request.user
-        request = request.user
-        serializer = TreeSerializer(data=request.data)
-        #serializer holds a django model
-        serializer.save(owner=owner)
-
     def get_queryset(self):
         """
         This view should return a list of all the project_affected_persons
@@ -247,6 +238,11 @@ class TreeList(generics.ListCreateAPIView):
         """
         owner = self.request.user
         return Tree.objects.filter(owner=owner).order_by('-rate')
+    
+    def perform_create(self, serializer):
+        owner = self.request.user
+        #serializer holds a django model
+        serializer.save(owner=owner)
 
 #tree details  
 class TreeDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -299,7 +295,7 @@ class TreeDetailNameView(viewsets.ViewSet):
 class CropListName(generics.ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = CropList.objects.all().order_by('-created')
+    queryset = CropName.objects.all().order_by('-created')
     serializer_class = CropListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -316,7 +312,7 @@ class CropListName(generics.ListCreateAPIView):
 class CropListDetailName(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = CropList.objects.all().order_by('-created')
+    queryset = CropName.objects.all().order_by('-created')
     serializer_class = CropListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -426,7 +422,7 @@ class PapCrop(viewsets.ViewSet):
 class LandListName(generics.ListCreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = LandList.objects.all().order_by('-created')
+    queryset = LandName.objects.all().order_by('-created')
     serializer_class = LandListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -441,7 +437,7 @@ class LandListName(generics.ListCreateAPIView):
 class LandListDetailName(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = LandList.objects.all().order_by('-created')
+    queryset = LandName.objects.all().order_by('-created')
     serializer_class = LandListSerialier
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
@@ -651,29 +647,6 @@ class UploadFileView(generics.CreateAPIView):
         return Response({"status": "success"},
                         status.HTTP_201_CREATED)
 
-#Tree CSV FILE UPLOADS
-class UploadTreeFileView(generics.CreateAPIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = TreeUploadSerializer
-    
-    def create(self, request, *args, **kwargs):
-        owner = self.request.user
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        file = serializer.validated_data['file']
-        reader = pd.read_csv(file)
-        for _, row in reader.iterrows():
-            new_trees_file = TreeList(
-                       owner = owner,
-                       name= row["name"],
-                       rate= row["rate"],
-                       district= row["district"]
-                       )
-            new_trees_file.save()
-        return Response({"status": "success"},
-                        status.HTTP_201_CREATED)
-
 #Crop CSV FILE UPLOADS
 class UploadCropFileView(generics.CreateAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -687,7 +660,7 @@ class UploadCropFileView(generics.CreateAPIView):
         file = serializer.validated_data['file']
         reader = pd.read_csv(file)
         for _, row in reader.iterrows():
-            new_file = ConstructionList(
+            new_file = CropName(
                        owner = owner,
                        name= row["name"],
                        rate= row['rate'],
@@ -710,7 +683,7 @@ class UploadConstructionFileView(generics.CreateAPIView):
         file = serializer.validated_data['file']
         reader = pd.read_csv(file)
         for _, row in reader.iterrows():
-            new_file = ConstructionList(
+            new_file = ConstructionName(
                        owner = owner,
                        name= row["name"]
                        )
@@ -737,26 +710,6 @@ class UploadTenureFileView(generics.CreateAPIView):
                        name= row["name"],
                        )
             new_file.save()
-        return Response({"status": "success"},status.HTTP_201_CREATED)
-
-
-#Land CSV FILE UPLOADS
-class UploadLandListFileView(generics.CreateAPIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = LandListUploadSerializer
-
-    def create(self, request):
-        owner = self.request.user
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid()
-        file = serializer.validated_data['file']
-        reader = pd.read_csv(file)
-        for _, row in reader.iterrows():
-            new_land_file = LandList(
-                owner = owner,
-                name = row['name'])
-            new_land_file.save()
         return Response({"status": "success"},status.HTTP_201_CREATED)
 
 

@@ -40,9 +40,7 @@ urlpatterns = [
     path('api/upload/papcsv/', views.UploadFileView.as_view(), name='upload-pap-file-csv'),
     path('api/upload/cropcsv/', views.UploadCropFileView.as_view(), name='upload-crop-file-csv'),
     path('api/upload/constructioncsv/', views.UploadConstructionFileView.as_view(), name='upload-construction-file-csv'),
-    path('api/upload/treecsv/', views.UploadTreeFileView.as_view(), name='upload-trees-file-csv'),
-    path('api/upload/tenurecsv/', views.UploadTenureFileView.as_view(), name='upload-tenure-file-csv'),
-    path('api/upload/landcsv/', views.UploadLandListFileView.as_view(), name='upload-land-file-csv')
+    path('api/upload/tenurecsv/', views.UploadTenureFileView.as_view(), name='upload-tenure-file-csv')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
