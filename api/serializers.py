@@ -35,7 +35,11 @@ class ConstructionListSerialier(serializers.ModelSerializer):
         return ConstructionName.objects.create(**validated_data)
 
 class ConstructionBuildingSerializer(serializers.ModelSerializer):
-    pap = PaPRelatedField()
+    pap = serializers.SlugRelatedField(
+        slug_field='first_name',
+        queryset=ProjectAffectedPerson.objects.all()
+
+    )
     name = serializers.SlugRelatedField(
         slug_field='name',
         queryset=ConstructionName.objects.all()
@@ -159,9 +163,9 @@ class TreeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Create and return a new `Tree` instance, given the validated data.
+        Create and return a new `ProjectAffectedPerson` instance, given the validated data.
         """
-        Tree.objects.create(**validated_data)
+        return Tree.objects.create(**validated_data)
 
     
 class ProjectAffectedPersonSerializer(serializers.ModelSerializer):

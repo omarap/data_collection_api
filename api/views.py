@@ -207,6 +207,14 @@ class TreeListName(generics.ListCreateAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
+    def get_queryset(self):
+        """
+        This view should return a list of all tree names
+        for the currently authenticated user.
+        """
+        owner = self.request.user
+        return TreeName.objects.filter(owner=owner).order_by('-rate')
+
     def perform_create(self, serializer):
         owner = self.request.user
         #serializer holds a django model
@@ -228,6 +236,7 @@ class TreeList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Tree.objects.all().order_by('-rate')
     serializer_class = TreeSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
 
