@@ -134,7 +134,7 @@ class CropName(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} {self.rate} {self.district}"
+        return f"{self.name} {self.district}"
 
 # Class model for crop
 class Crop(models.Model):
