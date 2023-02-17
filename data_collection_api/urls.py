@@ -14,8 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+
 from django.contrib import admin
 from django.urls import path, include
+from django.views.decorators.csrf import ensure_csrf_cookie
+from api import views
 from django.conf import settings
 from django.conf.urls.static import static
 from dj_rest_auth.views import (
@@ -29,6 +32,7 @@ urlpatterns = [
     path('', include('api.urls')),
     path('api/analysis/', include('analysis.urls')),
     path('api/pandas/analysis/', include('pandas_analysis.urls')),
+    path('api/csrftoken/', ensure_csrf_cookie(views.fetch_csrf_token), name='fetch_csrf_token'),
     path('api-auth/', include('rest_framework.urls')),
     path('password/reset/confirm/<uidb64>/<token>',PasswordResetConfirmView.as_view(),
         name='password_reset_confirm'),
