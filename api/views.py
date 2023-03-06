@@ -16,6 +16,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import *
 from rest_framework import status
 import io, csv, pandas as pd
+#new
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 
 @api_view(['GET'])
 def api_root(request, format = None):
@@ -35,6 +38,9 @@ def api_root(request, format = None):
       'upload_construction_csv_file': reverse('upload-construction-file-csv', request = request, format = format),
       'upload_tenure_csv_file': reverse('upload-tenure-file-csv', request = request, format = format)
    })
+@ensure_csrf_cookie
+def fetch_csrf_token(request):
+    return JsonResponse({'csrftoken': request.COOKIES.get('csrftoken')})   
 
 #projected affected person
 class ProjectAffectedPersonList(generics.ListCreateAPIView):
