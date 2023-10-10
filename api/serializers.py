@@ -14,7 +14,8 @@ class UserPapForeignKeyField(serializers.SlugRelatedField):
         return ProjectAffectedPerson.objects.filter(owner=user)
     
     def get_search_results(self, queryset, search_term, request):
-        owner = request.user
+        #owner = self.request.user
+        owner = self.context['request'].user
         queryset, use_distinct = super().get_search_results(queryset, search_term, request)
         paps = ProjectAffectedPerson.objects.all()
         queryset = paps.filter(owner=owner)
