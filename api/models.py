@@ -22,7 +22,7 @@ class ProjectAffectedPerson(models.Model):
 
 class ConstructionName(models.Model):
     name = models.CharField(max_length=100)
-    owner = models.ForeignKey(User, related_name='construction_list_owners', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='construction_list_names', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -47,7 +47,7 @@ class ConstructionBuilding(models.Model):
     rate = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='construction_list_owners', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

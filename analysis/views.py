@@ -56,7 +56,7 @@ class CropAnalysisView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        number_of_crops = Crop.objects.all().aggregate(Count('name'))
+        number_of_crops = Crop.objects.all().aggregate(Count('crop_name'))
         return Response(number_of_crops)
 
 #Total value of crops

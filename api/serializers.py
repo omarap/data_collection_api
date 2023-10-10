@@ -5,22 +5,18 @@ from .models import *
 from django.db.models.fields import *
 
 
-#function to limit paps to current user i.e. pap owner or view only your created paps
-class UserPapForeignKey(serializers.SlugRelatedField):
-    def get_queryset(self):
-        qs = super().get_queryset()
-        request = self.context.get('request')
-        qs = ProjectAffectedPerson.objects.filter(owner = self.context["request"].user).order_by('-created')[:6]
-        return qs
-    
 
-class PaPRelatedField(serializers.PrimaryKeyRelatedField):
+#function to limit paps to current user i.e. pap owner or view only your created pap
+class UserPapForeignKeyField(serializers.SlugRelatedField):
     def get_queryset(self):
-        qs = super().get_queryset()
-        request = self.context.get('request')
-        id  = None
-        ps = ProjectAffectedPerson.objects.filter(id=id,owner=request.user)
-        return qs
+        user = self.context['request'].user
+        return ProjectAffectedPerson.objects.filter(owner=user)
+    
+#function to limit paps to current current user while creating a land item
+class LandPap(serializers.SlugRelatedField):
+    def get_queryset(self):
+        user = self.context['request'].user
+        return ProjectAffectedPerson.objects.filter(user=user)
 
 class ConstructionListSerialier(serializers.ModelSerializer):
     
@@ -35,15 +31,9 @@ class ConstructionListSerialier(serializers.ModelSerializer):
         return ConstructionName.objects.create(**validated_data)
 
 class ConstructionBuildingSerializer(serializers.ModelSerializer):
-    pap = serializers.SlugRelatedField(
-        slug_field='first_name',
-        queryset=ProjectAffectedPerson.objects.all()
-
-    )
-    name = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=ConstructionName.objects.all()
-    )
+    #pap = UserPapForeignKeyField(queryset=ProjectAffectedPerson.objects.all(), slug_field='slug')
+    pap = UserPapForeignKeyField(queryset=ProjectAffectedPerson.objects.all(), slug_field='first_name')
+    name = serializers.SlugRelatedField(queryset=ConstructionName.objects.all(), slug_field='name')
     
     class Meta:
         model = ConstructionBuilding
@@ -70,16 +60,9 @@ class CropListSerialier(serializers.ModelSerializer):
 
 
 class CropSerializer(serializers.ModelSerializer):
-    pap = serializers.SlugRelatedField(
-        slug_field='first_name',
-        queryset=ProjectAffectedPerson.objects.all()
+    pap = UserPapForeignKeyField(queryset=ProjectAffectedPerson.objects.all(), slug_field='first_name')
+    crop_name = serializers.SlugRelatedField(queryset=CropName.objects.all(),slug_field='name')
 
-    )
-    crop_name = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=CropName.objects.all()
-
-    )
     class Meta:
         model = Crop
         fields = ['crop_name', 'crop_image','description', 'quantity', 'quality', 'rate',
@@ -116,18 +99,10 @@ class TenureTypeSerialier(serializers.ModelSerializer):
         return TenureType.objects.create(**validated_data)
 
 class LandSerializer(serializers.ModelSerializer):
-    pap = serializers.SlugRelatedField(
-        slug_field='first_name',
-        queryset=ProjectAffectedPerson.objects.all()
-    )
-    land_type = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=LandName.objects.all()
-    )
-    tenure = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=TenureType.objects.all()
-    )
+    pap = LandPap(queryset=ProjectAffectedPerson.objects.all(), slug_field='first_name')
+    pap = serializers.SlugRelatedField(slug_field='first_name',queryset=ProjectAffectedPerson.objects.all())
+    land_type = serializers.SlugRelatedField(slug_field='name', queryset=LandName.objects.all())
+    tenure = serializers.SlugRelatedField(slug_field='name', queryset=TenureType.objects.all())
 
     class Meta:
         model = Land
@@ -147,15 +122,8 @@ class TreeListSerialier(serializers.ModelSerializer):
         return TreeName.objects.create(**validated_data)
 
 class TreeSerializer(serializers.ModelSerializer):
-    pap = serializers.SlugRelatedField(
-        slug_field='first_name',
-        queryset=ProjectAffectedPerson.objects.all()
-
-    )
-    name = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=TreeName.objects.all()
-    )
+    pap = UserPapForeignKeyField(queryset=ProjectAffectedPerson.objects.all(), slug_field='first_name')
+    name = serializers.SlugRelatedField(slug_field='name',queryset=TreeName.objects.all())
     
     class Meta:
         model = Tree
