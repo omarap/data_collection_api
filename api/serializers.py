@@ -3,7 +3,8 @@ from rest_framework import serializers
 from rest_framework import *
 from .models import *
 from django.db.models.fields import *
-
+import django_filters
+from .filters import ConstructionBuildingFilter  # Import the filter class
 
 
 #function to limit paps to current user i.e. pap owner or view only your created pap
@@ -11,6 +12,13 @@ class UserPapForeignKeyField(serializers.SlugRelatedField):
     def get_queryset(self):
         user = self.context['request'].user
         return ProjectAffectedPerson.objects.filter(owner=user)
+    
+    def get_search_results(self, queryset, search_term, request):
+        owner = request.user
+        queryset, use_distinct = super().get_search_results(queryset, search_term, request)
+        paps = ProjectAffectedPerson.objects.all()
+        queryset = paps.filter(owner=owner)
+        return queryset, use_distinct
     
 #function to limit paps to current current user while creating a land item
 class LandPap(serializers.SlugRelatedField):
@@ -44,6 +52,12 @@ class ConstructionBuildingSerializer(serializers.ModelSerializer):
         Create and return a new `Crop` instance, given the validated data.
         """
         return ConstructionBuilding.objects.create(**validated_data)
+
+#Construction search serializer
+class ConstructionSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConstructionBuilding
+        fields =  fields = '__all__'
 
 
 class CropListSerialier(serializers.ModelSerializer):

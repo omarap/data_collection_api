@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from api.models import *
 from api.serializers import *
+from .filters import ConstructionBuildingFilter  #New
+import django_filters
 from rest_framework.renderers import *
 from rest_framework.parsers import *
 from rest_framework import viewsets
@@ -113,14 +115,13 @@ class ConstructionListName(generics.ListCreateAPIView):
         #serializer holds a django model
         serializer.save(owner=owner)
         
-#crop details
+#construction details
 class ConstructionListDetailName(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = ConstructionName.objects.all().order_by('-created')
     serializer_class = ConstructionListSerialier
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['name']
 
     
@@ -130,16 +131,21 @@ class ConstructionBuildingList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = ConstructionBuilding.objects.all().order_by('name')
     serializer_class = ConstructionBuildingSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['name']
+
 
     def get_queryset(self):
         """
         This view should return a list of all the project_affected_persons
         for the currently authenticated user.
         """
-        owner = self.request.user
-        return ConstructionBuilding.objects.filter(owner=owner).order_by('-rate')
+        queryset = super().get_queryset()
+        constructions =  ConstructionBuilding.objects.all().order_by('-rate')
+        queryset = constructions.filter(owner=self.request.user)
+        return queryset
+        #owner = self.request.user
+        #return ConstructionBuilding.objects.filter(owner=owner).order_by('-rate')
     
     def perform_create(self, serializer):
         owner = self.request.user
@@ -722,3 +728,24 @@ class UploadTenureFileView(generics.CreateAPIView):
         return Response({"status": "success"},status.HTTP_201_CREATED)
 
 
+
+
+#construction search view
+class GenericSearchListView(generics.ListCreateAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = ConstructionBuilding.objects.all().order_by('name')
+    serializer_class = ConstructionBuildingSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = ConstructionBuildingFilter
+    search_fields = ['name']
+
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # filter based on the authenticated user's data:
+        constructions = ConstructionBuilding.objects.all().order_by('name')
+        queryset = constructions.filter(owner=self.request.user)
+
+        return queryset

@@ -35,12 +35,13 @@ urlpatterns = [
     path('api/tenuretypes/', views.TenureList.as_view(), name='tenure-types'),
     path('api/tenuretypes/<int:pk>/', views.TenureDetail.as_view(), name='tenure-type-details'),
     path('api/land/<land_type>/', views.LandDetailNameView.as_view({'get': 'list'}), name='land-detail-name'),
-    path('api/land/<land_type>/count/', views.LandDetailNameView.as_view({'get': 'count_land'}), name='land-detail-name'),
+    path('api/land/<land_type>/count/', views.LandDetailNameView.as_view({'get': 'count_lansd'}), name='land-detail-name'),
     path('api/papland/<first_name>/', views.PapLandView.as_view({'get': 'list'}), name='pap-land'),
     path('api/upload/papcsv/', views.UploadFileView.as_view(), name='upload-pap-file-csv'),
     path('api/upload/cropcsv/', views.UploadCropFileView.as_view(), name='upload-crop-file-csv'),
     path('api/upload/constructioncsv/', views.UploadConstructionFileView.as_view(), name='upload-construction-file-csv'),
-    path('api/upload/tenurecsv/', views.UploadTenureFileView.as_view(), name='upload-tenure-file-csv')
+    path('api/upload/tenurecsv/', views.UploadTenureFileView.as_view(), name='upload-tenure-file-csv'),
+    path('api/test/', views.GenericSearchListView.as_view(), name='model-test-search') #
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
