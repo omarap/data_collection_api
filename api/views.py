@@ -40,7 +40,7 @@ def api_root(request, format = None):
 
 # A custom function to check if the user is an admin
 def is_admin(user):
-    return user.is_admin
+    return user.is_staff
 
 #projected affected person
 class ProjectAffectedPersonList(generics.ListCreateAPIView):
