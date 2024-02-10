@@ -53,12 +53,22 @@ class ProjectAffectedPersonList(generics.ListCreateAPIView):
 
 
     def get_queryset(self):
+        queryset = super().get_queryset()
+
         """
         This view should return a list of all the project_affected_persons
         for the currently authenticated user.
         """
-        owner = self.request.user
-        return ProjectAffectedPerson.objects.filter(owner=owner).order_by('-created')
+         # Check if the user is an admin
+        if is_admin(self.request.user):
+            # Return all project affected people if the user is an admin
+            queryset = ProjectAffectedPerson.objects.all().order_by('-created')
+        else:
+            # Filter project affected people by the request.user if not an admin
+            queryset = ConstructionBuilding.objects.filter(owner=self.request.user)
+
+        return queryset
+    
     
     def perform_create(self, serializer):
         owner = self.request.user
