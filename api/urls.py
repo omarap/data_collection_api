@@ -4,6 +4,21 @@ from api import views
 
 urlpatterns = [
     path('', views.api_root, name='main'),
+
+    #Authentication logins
+    path('api-auth/logout/', views.LogoutView.as_view(), name='logout'),
+
+    #custom authenications
+    #path('api-auth/login/', views.CustomLoginView.as_view(), name='custom_login'),
+    path('api-auth/password/change/', views.CustomPasswordChangeView.as_view(), name='custom_password_change'),
+    path('api-auth/password/reset/', views.CustomPasswordResetView.as_view(), name='custom_password_reset'),
+    path('api-auth/password/reset/confirm/', views.CustomPasswordResetConfirmView.as_view(), name='custom_password_reset_confirm'),
+    path('api-auth/user/', views.CustomUserDetailsView.as_view(), name='custom_user_details'),
+
+    #project views
+    path('api/projects/', views.ProjectListCreateAPIView.as_view(), name='project-list-create'),
+    path('api/projects/<int:pk>/', views.ProjectRetrieveUpdateDestroyAPIView.as_view(), name='project-retrieve-update-destroy'),
+    
     path('api/paps/', views.ProjectAffectedPersonList.as_view(), name='pap-list'),
     path('api/paps/<int:pk>/', views.ProjectAffectedPersonDetail.as_view(), name='pap-detail'),
     path('api/paps/<first_name>/', views.ProjectAffectedPersonNameView.as_view({'get': 'list'}), name='pap-name'),

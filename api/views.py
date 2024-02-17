@@ -17,6 +17,17 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import *
 from rest_framework import status
+from django.contrib.auth import logout, login
+
+#authentication views
+from dj_rest_auth.views import (
+    LoginView as DjLoginView,
+    PasswordChangeView as DjPasswordChangeView,
+    PasswordResetConfirmView as DjPasswordResetConfirmView,
+    PasswordResetView as DjPasswordResetView,
+    UserDetailsView as DjUserDetailsView,
+)
+
 import io, csv, pandas as pd
 
 @api_view(['GET'])
@@ -37,6 +48,110 @@ def api_root(request, format = None):
       'upload_construction_csv_file': reverse('upload-construction-file-csv', request = request, format = format),
       'upload_tenure_csv_file': reverse('upload-tenure-file-csv', request = request, format = format)
    })
+
+
+#project view
+class ProjectListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = PSerializer
+
+class ProjectRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Project.objects.all()
+    serializer_class = PSerializer
+
+
+#Authentication
+class CustomLoginView(DjLoginView):
+    """
+    Custom LoginView.
+
+    Inherits from DjLoginView provided by dj_rest_auth.
+    """
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests.
+
+        Calls parent's post method to process the request.
+        """
+        response = super().post(request, *args, **kwargs)
+        return response
+
+
+class CustomPasswordChangeView(DjPasswordChangeView):
+    """
+    Custom PasswordChangeView.
+
+    Inherits from DjPasswordChangeView provided by dj_rest_auth.
+    """
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests.
+
+        Calls parent's post method to process the request.
+        """
+        response = super().post(request, *args, **kwargs)
+        return response
+
+
+class CustomPasswordResetConfirmView(DjPasswordResetConfirmView):
+    """
+    Custom PasswordResetConfirmView.
+
+    Inherits from DjPasswordResetConfirmView provided by dj_rest_auth.
+    """
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests.
+
+        Calls parent's post method to process the request.
+        """
+        response = super().post(request, *args, **kwargs)
+        return response
+
+
+class CustomPasswordResetView(DjPasswordResetView):
+    """
+    Custom PasswordResetView.
+
+    Inherits from DjPasswordResetView provided by dj_rest_auth.
+    """
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests.
+
+        Calls parent's post method to process the request.
+        """
+        response = super().post(request, *args, **kwargs)
+        return response
+
+
+class CustomUserDetailsView(DjUserDetailsView):
+    """
+    Custom UserDetailsView.
+
+    Inherits from DjUserDetailsView provided by dj_rest_auth.
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests.
+
+        Calls parent's get method to process the request.
+        """
+        response = super().get(request, *args, **kwargs)
+        return response
+
+
+
+#logout view
+class LogoutView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({"detail": "Logged out successfully."}, status=status.HTTP_200_OK)
+
+    def get(self, request):
+        logout(request)
+        return Response({"detail": "Logged out successfully."}, status=status.HTTP_200_OK)
+
 
 # A custom function to check if the user is an admin
 def is_admin(user):
@@ -825,3 +940,5 @@ class GenericSearchListView(generics.ListCreateAPIView):
         queryset = constructions.filter(owner=self.request.user)
 
         return queryset
+    
+

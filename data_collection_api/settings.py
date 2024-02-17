@@ -195,8 +195,8 @@ STATICFILES_DIRS = [
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
-LOGIN_REDIRECT_URL = 'main'
-LOGIN_REDIRECT_URL = 'main'
+LOGIN_REDIRECT_URL = ''
+LOGIN_REDIRECT_URL = ''
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
