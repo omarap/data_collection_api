@@ -7,6 +7,9 @@ from django.utils import timezone
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    owner = models.ForeignKey(User, related_name='project_owners', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -22,8 +25,8 @@ class ProjectAffectedPerson(models.Model):
     nin = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=20)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
     owner = models.ForeignKey(User, related_name='owners', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -33,8 +36,8 @@ class ProjectAffectedPerson(models.Model):
 class ConstructionName(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, related_name='construction_list_names', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -48,8 +51,8 @@ class ConstructionBuilding(models.Model):
     size = models.FloatField(default=0)
     number_of_construction = models.PositiveSmallIntegerField(default=0)
     rate = models.PositiveIntegerField(default=0)
-    created = models.DateTimeField(auto_now_add=True,null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
     owner = models.ForeignKey(User, related_name='construction_list_owners', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -61,8 +64,8 @@ class TreeName(models.Model):
     rate = models.PositiveIntegerField(default=0, blank=True)
     district = models.CharField(max_length=100, blank=True)
     owner = models.ForeignKey(User, related_name='tree_list_owners', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -76,8 +79,8 @@ class Tree(models.Model):
     tree_image = models.ImageField(upload_to='tree_uploads', blank=True)
     quantity = models.PositiveSmallIntegerField(default=0)
     rate = models.PositiveIntegerField(default=0)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -89,8 +92,8 @@ class CropName(models.Model):
     rate = models.PositiveIntegerField()
     district = models.CharField(max_length=100, blank=True)
     owner = models.ForeignKey(User, related_name='crop_list_owners', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return f"{self.name} {self.district}"
@@ -106,8 +109,8 @@ class Crop(models.Model):
     rate = models.PositiveIntegerField()
     pap = models.ForeignKey(ProjectAffectedPerson, related_name='pap_crops', on_delete=models.CASCADE)
     owner = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return f"{self.crop_name} {self.pap} {self.quantity}"
@@ -116,8 +119,8 @@ class Crop(models.Model):
 class LandName(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, related_name='land_list_owners', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -126,8 +129,8 @@ class LandName(models.Model):
 class TenureType(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, related_name='user_tenures', on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return self.name
@@ -145,8 +148,8 @@ class Land(models.Model):
     land_use = models.TextField(blank=True)
     land_services = models.TextField(blank=True)
     rate = models.PositiveIntegerField(blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True, null =True)
-    updated = models.DateTimeField(auto_now=True, null =True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    updated = models.DateTimeField(auto_now=True, null=True)
     user = models.ForeignKey(User, related_name='user_lands', on_delete=models.CASCADE)
 
     def __str__(self):
